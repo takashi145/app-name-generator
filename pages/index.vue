@@ -1,5 +1,7 @@
 <script setup>
 </script>
 <template>
-  aa
+  <div class="text-red-400">
+    a
+  </div>
 </template>
