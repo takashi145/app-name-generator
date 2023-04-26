@@ -1,13 +1,10 @@
 import { OpenAIApi, Configuration } from 'openai';
+import { AppNames } from '@/interfaces/AppNames';
 
-type AppNames = {
-  name: string,
-  catchphrase: string,
-}
-
+// アプリ名やキャッチフレーズを要求するメッセージを生成
 const generateMessage = (description: string) => {
   return `
-    The output should be a markdown code snippet formatted in the following schema in Japanese:
+    The output should be a markdown code snippet formatted in the following schema in English:
 
     \`\`\`json
     [
@@ -23,23 +20,23 @@ const generateMessage = (description: string) => {
     \`\`\`
 
     NOTES:
-    * Do not include app names that do not exist.
     * Please do not include anything other than JSON in your answer.
 
-    「${description}」アプリを作成したいです。アプリ名を5つ考えてください。
+    I want to create a "${description}" app. Please come up with 5 names for the app.
   `
 }
 
+// 文字列を解析し、JSON コンテンツを抽出
 const parseGPTResponse = (gptResponse: string): AppNames[] => {
-  const regex = /```json([\s\S]*?)```/gm
-  const match = regex.exec(gptResponse)
+  const regex = /```json([\s\S]*?)```/gm;
+  const match = regex.exec(gptResponse);
 
   if (match === null || match?.[1] === null) {
-    throw new Error("JSON content not found in the string")
+    throw new Error("JSON content not found in the string");
   }
-  const jsonData: object = JSON.parse(match[1])
+  const jsonData: AppNames[] = JSON.parse(match[1]);
 
-  return jsonData as AppNames[]
+  return jsonData as AppNames[];
 }
 
 export default defineEventHandler(async (event) => {
@@ -61,11 +58,12 @@ export default defineEventHandler(async (event) => {
     temperature: 0.6,
   });
 
-  if(!res.data.choices[0].message?.content) {
-    throw new Error('error');
+  const messageContent = res.data.choices[0].message?.content;
+  if(!messageContent) {
+    throw new Error('response does not contain a message content');
   }
 
-  const results = parseGPTResponse(res.data.choices[0].message?.content);
+  const results = parseGPTResponse(messageContent);
   
   return results;
 })
