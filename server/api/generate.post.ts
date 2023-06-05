@@ -4,7 +4,7 @@ import { AppNames } from '@/interfaces/AppNames';
 // アプリ名やキャッチフレーズを要求するメッセージを生成
 const generateMessage = (description: string) => {
   return `
-    The output should be a markdown code snippet formatted in the following schema in English:
+    The output should be a markdown code snippet formatted in the following schema in Japanese:
 
     \`\`\`json
     [
