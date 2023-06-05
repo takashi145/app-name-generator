@@ -2,14 +2,25 @@ import { OpenAIApi, Configuration } from 'openai';
 import { AppNames } from '@/interfaces/AppNames';
 
 // アプリ名やキャッチフレーズを要求するメッセージを生成
-const generateMessage = (description: string) => {
+const generateMessage = (description: string, lang: string) => {
+  let language = "japanese";
+  switch(lang) {
+    case "ja":
+      language = "japanese";
+      break;
+    case "en":
+      language = "english";
+      break;
+    default:
+      language = "japanese";
+  }
   return `
-    The output should be a markdown code snippet formatted in the following schema in Japanese:
+    The output should be a markdown code snippet formatted in the following schema in ${language}:
 
     \`\`\`json
     [
       {
-        name: string, // name of the app.
+        name: string, // name of the app
         catchphrase: string // catchphrase of the app.
       },
       {
@@ -41,7 +52,7 @@ const parseGPTResponse = (gptResponse: string): AppNames[] => {
 
 export default defineEventHandler(async (event) => {
   const { openaiApiKey } = useRuntimeConfig();
-  const { description } = await readBody(event);
+  const { description, lang } = await readBody(event);
 
   const configuration = new Configuration({
     apiKey: openaiApiKey
@@ -53,7 +64,7 @@ export default defineEventHandler(async (event) => {
     model: "gpt-3.5-turbo",
     messages: [
       {role: 'assistant', content: 'You are a helpful assistant.'},
-      {role: 'user', content: generateMessage(description)},
+      {role: 'user', content: generateMessage(description, lang)},
     ],
     temperature: 0.6,
   });

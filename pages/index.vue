@@ -5,7 +5,7 @@ const results: Ref<AppNames[]> = ref([]);
 
 const loading = ref(false);
 
-const submit = async (description: string) => {
+const submit = async (description: string, lang: string) => {
   if(!description) {
     alert('説明文を入力してください。')
     return;
@@ -18,7 +18,7 @@ const submit = async (description: string) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ description: description }),
+      body: JSON.stringify({ description: description, lang: lang }),
     })
 
     results.value = response;
